@@ -1,1 +1,1 @@
-# AstrBot Contributors
+# AstrBot Contributors CosMap
