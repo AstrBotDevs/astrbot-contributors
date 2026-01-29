@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AstrBot 贡献者宇宙</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="space"></canvas>
+  <main class="scene">
+    <header class="hero">
+      <div class="hero__badge" data-i18n="heroBadge">ASTRBOT / CONTRIBUTORS</div>
+      <h1 data-i18n="heroTitle">贡献者宇宙</h1>
+      <div class="hero__actions">
+        <button id="toggle-constellation" data-i18n="toggleConstellation">星图模式</button>
+        <button id="toggle-lang" data-i18n="toggleLang">English</button>
+      </div>
+    </header>
+
+    <section class="panel" id="astrbot-section">
+      <div class="panel__header">
+        <div>
+          <h2 data-i18n="astrbotTitle">AstrBot 贡献者</h2>
+          <p data-i18n="astrbotDesc">核心仓库：AstrbotDevs/AstrBot</p>
+        </div>
+        <div class="panel__meta" id="astrbot-meta" data-i18n="loading">加载中…</div>
+      </div>
+      <div class="grid" id="astrbot-grid"></div>
+    </section>
+
+    <section class="panel" id="plugins-section">
+      <div class="panel__header">
+        <div>
+          <h2 data-i18n="pluginsTitle">插件贡献者</h2>
+          <p data-i18n="pluginsDesc">从插件仓库聚合贡献者星图</p>
+        </div>
+        <div class="panel__meta" id="plugins-meta" data-i18n="waiting">等待星云展开…</div>
+      </div>
+      <div class="grid" id="plugins-grid"></div>
+    </section>
+
+    <footer class="footer">
+      <div data-i18n="footer">Powered by 3D 星图引擎 • 交互提示：移动鼠标 / 拖动 / 滚动缩放</div>
+    </footer>
+  </main>
+  <div id="flight-hud" class="hud">
+    <div class="hud__title" data-i18n="hudTitle">Flight</div>
+    <div class="hud__stat"><span data-i18n="hudSpeed">Speed</span><strong id="hud-speed">0.00</strong></div>
+    <div class="hud__stat"><span data-i18n="hudAccel">Accel</span><strong id="hud-accel">0.00</strong></div>
+  </div>
+  <div id="star-tooltip" class="tooltip"></div>
+
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
