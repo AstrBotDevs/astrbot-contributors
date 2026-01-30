@@ -87,6 +87,14 @@ body {
   box-shadow: 0 0 24px rgba(217, 92, 255, 0.35);
 }
 
+.disclaimer {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  border-left: 3px solid rgba(109, 224, 255, 0.4);
+  padding-left: 12px;
+}
+
 .panel {
   background: var(--panel);
   border: 1px solid var(--panel-border);

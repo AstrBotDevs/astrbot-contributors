@@ -1,4 +1,5 @@
-const astrbotApi = "https://api.github.com/repos/AstrbotDevs/AstrBot/contributors?per_page=1000";
+const ASTRBOT_API_BASE = "https://api.github.com/repos/AstrbotDevs/AstrBot/contributors";
+const GITHUB_PER_PAGE = 100;
 const pluginsApi = "https://api.soulter.top/astrbot/plugins";
 
 const astrbotGrid = document.getElementById("astrbot-grid");
@@ -45,6 +46,7 @@ const translations = {
     astrbotDesc: "核心仓库：AstrbotDevs/AstrBot",
     pluginsTitle: "插件贡献者",
     pluginsDesc: "从插件仓库聚合贡献者星图",
+    sortDisclaimer: "排序基于 GitHub API 的 contributions_count 汇总，仅供参考，无法衡量真实工作量。",
     footer: "Powered by 3D 星图引擎 • 交互提示：移动鼠标 / 拖动 / 滚动缩放",
     hudTitle: "飞行",
     hudSpeed: "速度",
@@ -71,6 +73,7 @@ const translations = {
     astrbotDesc: "Core repo: AstrbotDevs/AstrBot",
     pluginsTitle: "Plugin Contributors",
     pluginsDesc: "Aggregate contributors from plugin repos",
+    sortDisclaimer: "Ranking sums GitHub API contributions_count; it is for reference only and does not reflect actual workload.",
     footer: "Powered by 3D star map • Tips: move / drag / scroll",
     hudTitle: "Flight",
     hudSpeed: "Speed",
@@ -163,9 +166,23 @@ async function fetchJson(url) {
   return response.json();
 }
 
+async function fetchAllContributors(baseUrl) {
+  const all = [];
+  let page = 1;
+  while (true) {
+    const url = `${baseUrl}?per_page=${GITHUB_PER_PAGE}&page=${page}`;
+    const data = await fetchJson(url);
+    if (!Array.isArray(data) || data.length === 0) break;
+    all.push(...data);
+    if (data.length < GITHUB_PER_PAGE) break;
+    page += 1;
+  }
+  return all;
+}
+
 async function loadAstrBotContributors() {
   try {
-    const data = await fetchJson(astrbotApi);
+    const data = await fetchAllContributors(ASTRBOT_API_BASE);
     astrbotContributors = data;
     astrbotGrid.innerHTML = "";
     data.forEach((contributor, index) => {

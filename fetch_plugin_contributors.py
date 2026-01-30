@@ -14,6 +14,7 @@ from tqdm import tqdm
 
 PLUGINS_API = "https://api.soulter.top/astrbot/plugins"
 GITHUB_API = "https://api.github.com/repos/{owner}/{repo}/contributors"
+PER_PAGE = 100
 OUT_FILE = "plugins-contributors.json"
 
 
@@ -61,31 +62,51 @@ async def fetch_contributors(
     sem: asyncio.Semaphore,
     retries: int,
 ) -> Tuple[Dict[str, str], Optional[List[Dict]], Optional[str]]:
-    url = GITHUB_API.format(owner=repo["owner"], repo=repo["name"])
-    for attempt in range(retries + 1):
-        try:
-            async with sem:
-                async with session.get(
-                    url, timeout=aiohttp.ClientTimeout(total=30)
-                ) as resp:
-                    if resp.status == 200:
-                        return repo, await resp.json(), None
-                    if resp.status in (403, 429) and attempt < retries:
-                        print(
-                            f"Rate limited when fetching {repo['owner']}/{repo['name']}, "
-                            f"retrying... (attempt {attempt + 1})"
-                        )
-                        await asyncio.sleep(1.5 + attempt)
-                        continue
-                    return repo, None, f"{resp.status}"
-        except asyncio.TimeoutError:
-            if attempt < retries:
-                await asyncio.sleep(1.0 + attempt)
-                continue
-            return repo, None, "timeout"
-        except aiohttp.ClientError as exc:
-            return repo, None, str(exc)
-    return repo, None, "unknown"
+    base_url = GITHUB_API.format(owner=repo["owner"], repo=repo["name"])
+    contributors: List[Dict] = []
+    page = 1
+
+    while True:
+        page_url = f"{base_url}?per_page={PER_PAGE}&page={page}"
+        page_loaded = False
+
+        for attempt in range(retries + 1):
+            try:
+                async with sem:
+                    async with session.get(
+                        page_url, timeout=aiohttp.ClientTimeout(total=30)
+                    ) as resp:
+                        if resp.status == 200:
+                            data = await resp.json()
+                            if not data:
+                                return repo, contributors, None
+                            contributors.extend(data)
+                            page_loaded = True
+
+                            if len(data) < PER_PAGE:
+                                return repo, contributors, None
+
+                            page += 1
+                            break
+
+                        if resp.status in (403, 429) and attempt < retries:
+                            print(
+                                f"Rate limited when fetching {repo['owner']}/{repo['name']} page {page}, "
+                                f"retrying... (attempt {attempt + 1})"
+                            )
+                            await asyncio.sleep(1.5 + attempt)
+                            continue
+                        return repo, None, f"{resp.status}"
+            except asyncio.TimeoutError:
+                if attempt < retries:
+                    await asyncio.sleep(1.0 + attempt)
+                    continue
+                return repo, None, "timeout"
+            except aiohttp.ClientError as exc:
+                return repo, None, str(exc)
+
+        if not page_loaded:
+            return repo, None, "unknown"
 
 
 async def main_async(concurrency: int, retries: int, token: Optional[str]) -> None:
