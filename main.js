@@ -1,4 +1,4 @@
-const astrbotApi = "https://api.github.com/repos/AstrbotDevs/AstrBot/contributors?per_page=100";
+const astrbotApi = "https://api.github.com/repos/AstrbotDevs/AstrBot/contributors?per_page=1000";
 const pluginsApi = "https://api.soulter.top/astrbot/plugins";
 
 const astrbotGrid = document.getElementById("astrbot-grid");
